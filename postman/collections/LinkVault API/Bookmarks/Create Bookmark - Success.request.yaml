@@ -1,0 +1,32 @@
+$kind: http-request
+name: Create Bookmark - Success
+method: POST
+url: '{{baseUrl}}/bookmarks'
+order: 8000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "url": "https://postman.com",
+      "title": "Postman",
+      "tags": ["tool", "api"]
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 201", function () {
+        pm.response.to.have.status(201);
+      });
+      
+      pm.test("Response has bookmark.id", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData.bookmark).to.have.property("id");
+      });
+      
+      pm.collectionVariables.set("bookmarkId", pm.response.json().bookmark.id);

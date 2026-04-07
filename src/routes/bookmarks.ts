@@ -34,7 +34,7 @@ router.post('', async (req: AuthRequest, res: Response): Promise<void> => {
 
 router.get('', async (req: AuthRequest, res: Response): Promise<void> => {
     const { userId } = req.user!;
-    const { tags } = req.body;
+    const tags = req.query.tags ? (req.query.tags as string).split(',') : undefined;
 
     let query = 'SELECT * FROM bookmarks WHERE user_id = $1';
     const params: any[] = [userId];

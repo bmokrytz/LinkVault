@@ -1,0 +1,27 @@
+$kind: http-request
+name: Register - Duplicate Email
+method: POST
+url: '{{baseUrl}}/auth/register'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "testuser_TEST_1775596164266@example.com",
+      "password": "password123"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 409", function () {
+        pm.response.to.have.status(409);
+      });
+      
+      pm.test("Response body contains error field", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData).to.have.property("error");
+      });

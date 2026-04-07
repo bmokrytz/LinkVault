@@ -1,0 +1,21 @@
+$kind: http-request
+name: Get All Bookmarks
+method: GET
+url: '{{baseUrl}}/bookmarks'
+order: 12000
+headers:
+  - key: Authorization
+    value: 'Bearer {{authToken}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      
+      pm.test("Response has bookmarks array", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData).to.have.property("bookmarks");
+        pm.expect(jsonData.bookmarks).to.be.an("array");
+      });

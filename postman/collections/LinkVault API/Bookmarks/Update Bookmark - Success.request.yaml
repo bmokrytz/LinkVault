@@ -1,0 +1,35 @@
+$kind: http-request
+name: Update Bookmark - Success
+method: PUT
+url: '{{baseUrl}}/bookmarks/{{bookmarkId}}'
+order: 16000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "url": "https://postman.com/updated",
+      "title": "Postman Updated",
+      "tags": ["tool", "updated"]
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      
+      pm.test("Response has bookmark object", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData).to.have.property("bookmark");
+      });
+      
+      pm.test("bookmark.title equals Postman Updated", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData.bookmark.title).to.equal("Postman Updated");
+      });

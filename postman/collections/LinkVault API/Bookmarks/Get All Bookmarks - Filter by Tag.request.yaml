@@ -1,0 +1,24 @@
+$kind: http-request
+name: 'Get All Bookmarks - Filter by Tag'
+method: GET
+url: '{{baseUrl}}/bookmarks'
+order: 13000
+headers:
+  - key: Authorization
+    value: 'Bearer {{authToken}}'
+queryParams:
+  - key: tags
+    value: work
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200", function () {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has bookmarks array", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData).to.have.property("bookmarks");
+        pm.expect(jsonData.bookmarks).to.be.an("array");
+      });

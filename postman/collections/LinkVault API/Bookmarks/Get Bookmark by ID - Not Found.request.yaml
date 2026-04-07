@@ -1,0 +1,20 @@
+$kind: http-request
+name: Get Bookmark by ID - Not Found
+method: GET
+url: '{{baseUrl}}/bookmarks/99999999'
+order: 15000
+headers:
+  - key: Authorization
+    value: 'Bearer {{authToken}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 404", function () {
+        pm.response.to.have.status(404);
+      });
+      
+      pm.test("Response has error field", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData).to.have.property("error");
+      });

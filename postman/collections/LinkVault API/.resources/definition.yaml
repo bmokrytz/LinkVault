@@ -1,0 +1,7 @@
+$kind: collection
+name: LinkVault API
+variables:
+  baseUrl: http://localhost:3000
+  authToken: ""
+  bookmarkId: ""
+  registrationEmail: ""

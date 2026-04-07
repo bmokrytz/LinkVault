@@ -1,0 +1,25 @@
+$kind: http-request
+name: Get Bookmark by ID
+method: GET
+url: '{{baseUrl}}/bookmarks/{{bookmarkId}}'
+order: 14000
+headers:
+  - key: Authorization
+    value: 'Bearer {{authToken}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      
+      pm.test("Response has bookmark object", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData).to.have.property("bookmark");
+      });
+      
+      pm.test("bookmark.id equals bookmarkId variable", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData.bookmark.id).to.equal(pm.collectionVariables.get("bookmarkId"));
+      });

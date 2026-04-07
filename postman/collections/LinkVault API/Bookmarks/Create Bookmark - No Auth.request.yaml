@@ -1,0 +1,27 @@
+$kind: http-request
+name: Create Bookmark - No Auth
+method: POST
+url: '{{baseUrl}}/bookmarks'
+order: 11000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "url": "https://postman.com",
+      "title": "Postman"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 401", function () {
+        pm.response.to.have.status(401);
+      });
+      
+      pm.test("Response error is No token provided", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData.error).to.equal("No token provided");
+      });

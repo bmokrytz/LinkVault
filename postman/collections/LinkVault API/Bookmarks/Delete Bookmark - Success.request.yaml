@@ -1,0 +1,15 @@
+$kind: http-request
+name: Delete Bookmark - Success
+method: DELETE
+url: '{{baseUrl}}/bookmarks/{{bookmarkId}}'
+order: 18000
+headers:
+  - key: Authorization
+    value: 'Bearer {{authToken}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 204", function () {
+        pm.response.to.have.status(204);
+      });

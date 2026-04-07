@@ -1,0 +1,38 @@
+$kind: http-request
+name: Register - Success
+method: POST
+url: '{{baseUrl}}/auth/register'
+order: 1000
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+        "email": "{{registrationEmail}}",
+        "password": "password123"
+    }
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      var randomEmail = 'testuser_' + Date.now() + '@example.com';
+      pm.collectionVariables.set("registrationEmail", randomEmail);
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 201", function () {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has token field", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData).to.have.property("token");
+      });
+
+      pm.test("Response has user.email field", function () {
+        var jsonData = pm.response.json();
+        pm.expect(jsonData.user).to.have.property("email");
+      });
+
+      pm.collectionVariables.set("authToken", pm.response.json().token);
