@@ -56,6 +56,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (result.rows.length === 0) {
+      // Same error for missing user and wrong password as to not leak whether email exists
       res.status(401).json({ error: 'Invalid credentials' });
       return;
     }
@@ -63,6 +64,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     const user = result.rows[0];
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
+      // Same error for missing user and wrong password as to not leak whether email exists
       res.status(401).json({ error: 'Invalid credentials' });
       return;
     }
