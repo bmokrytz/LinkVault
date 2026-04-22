@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="../../favicon_io/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../favicon_io/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../favicon_io/apple-touch-icon.png">
+    <link rel="manifest" href="../../favicon_io/site.webmanifest">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=check,delete,edit,settings" />
+
+    <title>LinkVault - Dashboard</title>
+    <script src="../../config.js"></script>
+    <script src="dashboard.js"></script>
+    <link rel="stylesheet" href="dashboard.css">
+  </head>
+
+
+  <body>
+    
+    <div id="header-bar">
+        <span id="title">LinkVault</span>
+        <div id="sign-out-btn-container">
+          <p id="signed-in-user-label">Signed in as: </p>
+          <p id="signed-in-user"></p>
+          <button id="sign-out-btn">Sign out</button>
+        </div>
+    </div>
+
+    <div id="root">
+
+        <div id="add-link-btn-container">
+          <button id="add-link-btn" class="add-link-btn-closed" value="closed"><span style="font-size: 20px; padding-right: 5px;">+</span> Add Link</button>
+        </div>
+
+        <div id="add-link-form-container">
+          <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <p>Add link details</p>
+            <p id="error-msg" style="display: none;"></p>
+          </div>
+          <form id="add-link-form">
+            <div style="display: flex; flex-direction: row;">
+              <div class="form-input-container">
+                <label>Link name:</label>
+                <input type="text" id="link-name" name="link-name">
+              </div>
+              <div class="form-input-container" style="padding-left: 20px;">
+                <label>URL:</label>
+                <input type="text" id="link-url" name="link-url">
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: row; padding-bottom: 10px;">
+              <div class="form-input-container">
+                <label>Folder:</label>
+                <select id="folder-select" style="width: 150px; height: 30px;">
+                  <option value="none">None</option>
+                  <option value="new-folder">Create new folder</option>
+                </select>
+              </div>
+              <div class="form-input-container" style="padding-left: 20px;">
+                <label>Tags (comma separated):</label>
+                <input type="text" id="link-tags" name="link-tags" placeholder="tag1,tag2,tag3">
+              </div>
+              <div id="submit-container">
+                <input type="submit" id="submit-btn" value="Submit">
+              </div>
+            </div>
+            <div id="folder-creation-container" style="display: flex; flex-direction: row; justify-content: start; padding-bottom: 10px;">
+              <div id="folder-name-input-container" class="form-input-container" style="display: none;">
+                <label>New folder name:</label>
+                <input type="text" id="folder-name">
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div id="folder:uncategorized" class="folder-card">
+          <div class="folder-card-header-container">
+            <div class="folder-card-title-container">
+              <span id="uncategorized-title" class="folder-card-title">Links</span>
+            </div>
+            <button class="folder-card-settings-btn"><span class="material-symbols-outlined">settings</span></button>
+          </div>
+
+
+          <div class="link-bin">
+          </div>
+          <div class="drawer-handle">
+            <p>_____________________________________</p>
+            <p class="drawer-arrow">&#x25BE;</p>
+          </div>
+        </div>
+
+    </div>
+
+  </body>
+
+
+</html>

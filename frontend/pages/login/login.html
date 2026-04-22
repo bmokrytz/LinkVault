@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="../../favicon_io/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../favicon_io/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../favicon_io/apple-touch-icon.png">
+    <link rel="manifest" href="../../favicon_io/site.webmanifest">
+    <title>LinkVault - Login</title>
+    <script src="../../config.js"></script>
+    <script src="login.js"></script>
+    <link rel="stylesheet" href="login.css">
+  </head>
+
+
+  <body>
+    <div id="back-btn-box">
+        <button id="back-btn">← Back</button>
+    </div>
+    <div id="root">
+        <div id="login-container">
+            <div id="form-container">
+                <h1>Login</h1>
+                <form id="login-form">
+                    <div id="submit-btn-container">
+                        <div class="auth-input" style="padding-bottom: 60px;">
+                            <label for="email">Email:</label><br>
+                            <input type="text" id="email" name="user-email" placeholder="you@example.com">
+                        </div>
+                        <div class="auth-input">
+                            <label for="password">Password:</label><br>
+                            <input type="password" id="password" name="user-password" placeholder="••••••••••••••••">
+                        </div>
+                        <div id="error-msg-container">
+                            <p id="error-msg"></p>
+                        </div>
+                        <div id="submit-container">
+                            <input type="submit" id="submit-btn" value="Submit">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+  </body>
+
+
+</html>

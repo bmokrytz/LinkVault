@@ -1,5 +1,8 @@
 node_modules/
 dist/
 .env
+client/.env
 .postman/
 postman/environments/
+lambda.zip
+client/

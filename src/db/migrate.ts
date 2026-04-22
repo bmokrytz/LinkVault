@@ -1,8 +1,8 @@
-import pool from './pool';
+import pool from "./pool";
 
 const migrate = async () => {
   const client = await pool.connect();
-  
+
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -25,9 +25,9 @@ const migrate = async () => {
       );
     `);
 
-    console.log('Migration complete');
+    console.log("Migration complete");
   } catch (err) {
-    console.error('Migration failed:', err);
+    console.error("Migration failed:", err);
   } finally {
     client.release();
     await pool.end();
