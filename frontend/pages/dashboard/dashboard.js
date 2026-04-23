@@ -17,9 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Error message functionality
     function showError(message) {
-        const error_msg = document.getElementById("error-msg");
-        error_msg.textContent = message;
-        error_msg.style.display = "block";
+        alert(message);
     }
     function hideError() {
         const error_msg = document.getElementById("error-msg");
@@ -58,6 +56,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             add_link_btn.classList.remove("add-link-btn-open");
             add_link_btn.innerHTML = '<span style="font-size: 20px; padding-right: 5px;">+</span> Add Link';
             hideLinkCreator();
+            const folder_creation_container = document.querySelector(".folder-creation-container");
+            if (!folder_creation_container.classList.contains("hidden")) {
+                folder_creation_container.classList.toggle("hidden");
+            }
         }
     });
     function showLinkCreator() {
@@ -76,6 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Toggle folder creation field in link creation form
     const folder_select = document.getElementById("folder-select");
     folder_select.addEventListener("change", (e) => {
+        console.log("here");
         if (e.target.value === "new-folder") {
             showFolderCreationDiv();
         }
@@ -84,13 +87,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
     function showFolderCreationDiv() {
-        const folder_creation_container = document.getElementById("folder-name-input-container");
-        folder_creation_container.style.display = "block";
+        const folder_creation_container = document.getElementById("folder-creation-container");
+        console.log(folder_creation_container);
+        if (folder_creation_container.classList.contains("hidden")) {
+            folder_creation_container.classList.toggle("hidden");
+        }
+        console.log(folder_creation_container);
     }
 
     function hideFolderCreationDiv() {
-        const folder_creation_container = document.getElementById("folder-name-input-container");
-        folder_creation_container.style.display = "none";
+        const folder_creation_container = document.getElementById("folder-creation-container");
+        if (!folder_creation_container.classList.contains("hidden")) {
+            folder_creation_container.classList.toggle("hidden");
+        }
     }
 
 
@@ -100,6 +109,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         e.preventDefault();
         hideError();
         disableSubmitBtn();
+        const title_state = document.getElementById("link-name-state");
+        const url_state = document.getElementById("link-url-state");
+        const tags_state = document.getElementById("link-tags-state");
+        const folder_name_state = document.getElementById("link-folder-name-state");
         const title = document.getElementById("link-name").value.trim();
         const url = document.getElementById("link-url").value.trim();
         if (!title || !url) {
@@ -123,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (tags.length > 0 && tags[0] !== "") {
                 body.tags = tags;
             }
-            const res = await fetch(`https://api.linkvault.ca/bookmarks`, {
+            const res = await fetch(`${CONFIG.API_BASE_URL}/bookmarks`, {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
@@ -154,9 +167,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             buildFolderCards(folders);
             link.link_folders.forEach((folder) => insertLinkIntoFolder(link, folder));
         } catch (err) {
-            console.log(err);
             showError("Internal server error");
         } finally {
+            const title = document.getElementById("link-name");
+            const url = document.getElementById("link-url");
+            const folder_select = document.getElementById("folder-select");
+            const link_tags = document.getElementById("link-tags");
+            title.value = title_state.value;
+            console.log(`title: _${title.value}_ title_state: _${title_state.value}_`);
+            url.value = url_state.value;
+            link_tags.value = tags_state.value;
+            folder_select.value = "none";
+            if (folder_select.value === "new-folder") {
+                const folder_name = document.getElementById("folder-name");
+                folder_name.value = folder_name_state.value;
+            }
+            const add_link_btn = document.getElementById("add-link-btn");
+            add_link_btn.click();
+            const folder_creation_container = document.querySelector(".folder-creation-container");
+            folder_creation_container.classList.toggle("hidden");
             enableSubmitBtn();
         }
     });
@@ -195,7 +224,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const bookmarks = data.bookmarks;
             return bookmarks;
         } catch(err) {
-            console.log(err);
             showError("Internal server error.");
             return [];
         }
@@ -269,6 +297,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const folder_card_edit_btn = document.createElement("button");
             folder_card_edit_btn.classList.add("folder-title-edit-btn");
             folder_card_edit_btn.classList.add("hidden");
+            folder_card_title.state = "closed";
             const folder_card_edit_btn_icon = document.createElement("span");
             folder_card_edit_btn_icon.classList.add("material-symbols-outlined");
             folder_card_edit_btn_icon.classList.add("folder-title-edit-btn-icon");
@@ -286,6 +315,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             folder_card_title_container.appendChild(accept_card_title_btn);
             folder_card_header_container.appendChild(folder_card_title_container);
 
+            const folder_card_header_buttons_container = document.createElement("div");
+            folder_card_header_buttons_container.classList.add("folder-card-header-buttons-container");
+            const open_all_links_btn = document.createElement("button");
+            open_all_links_btn.classList.add("open-all-links-btn");
+            const open_all_links_btn_span = document.createElement("span");
+            open_all_links_btn_span.classList.add("open-all-links-span");
+            open_all_links_btn_span.innerHTML = "Open All ";
+            const open_all_links_btn_span_icon = document.createElement("span");
+            open_all_links_btn_span_icon.classList.add("open-all-links-icon");
+            open_all_links_btn_span_icon.classList.add("material-symbols-outlined");
+            open_all_links_btn_span_icon.innerHTML = "arrow_outward";
+
+            open_all_links_btn.appendChild(open_all_links_btn_span);
+            open_all_links_btn.appendChild(open_all_links_btn_span_icon);
+            folder_card_header_buttons_container.appendChild(open_all_links_btn);
+
             // Build folder card settings button
             const folder_card_settings_btn = document.createElement("button");
             folder_card_settings_btn.classList.add("folder-card-settings-btn");
@@ -294,7 +339,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             folder_card_settings_btn_icon.classList.add("material-symbols-outlined");
             folder_card_settings_btn_icon.innerHTML = "settings";
             folder_card_settings_btn.appendChild(folder_card_settings_btn_icon);
-            folder_card_header_container.appendChild(folder_card_settings_btn);
+            folder_card_header_buttons_container.appendChild(folder_card_settings_btn);
+            folder_card_header_container.appendChild(folder_card_header_buttons_container);
 
             // Add folder card header container to folder card
             folder_card.appendChild(folder_card_header_container);
@@ -307,13 +353,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Build drawer handle
             const drawer_handle = document.createElement("div");
             drawer_handle.classList.add("drawer-handle");
-            const p1 = document.createElement("p");
-            p1.innerHTML = "_____________________________________";
-            const p2 = document.createElement("p");
-            p2.classList.add("drawer-arrow");
-            p2.innerHTML = "&#x25BE;";
-            drawer_handle.appendChild(p1);
-            drawer_handle.appendChild(p2);
+            const p = document.createElement("p");
+            p.classList.add("drawer-arrow");
+            p.innerHTML = "&#x25BE;";
+            drawer_handle.appendChild(p);
             folder_card.appendChild(drawer_handle);
 
             root.appendChild(folder_card);
@@ -325,42 +368,161 @@ document.addEventListener("DOMContentLoaded", async () => {
     function setupFolderCardButtons() {
         const folder_cards = document.querySelectorAll(".folder-card");
         folder_cards.forEach((folder_card) => {
+            const link_edit_button_containers = folder_card.querySelectorAll(".link-buttons-container");
+            link_edit_button_containers.forEach((container) => {
+                container.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                });
+            });
             const settings_button = folder_card.querySelector(".folder-card-settings-btn");
             settings_button.addEventListener("click", () => {
+                const folder_card = settings_button.closest(".folder-card");
+                folder_card.classList.toggle("editing");
+                const link_outer_containers = folder_card.querySelectorAll(".link-outer-container");
+                link_outer_containers.forEach((container) => {
+                    container.classList.toggle("blue-outline-hover");
+                });
                 const title_edit_btn = folder_card.querySelector(".folder-title-edit-btn");
                 if (title_edit_btn !== null) {
+                    if (title_edit_btn.state === "open") {
+                        title_edit_btn.click();
+                    }
                     title_edit_btn.classList.toggle("hidden");
                 }
                 const link_edit_containers = folder_card.querySelectorAll(".link-buttons-container");
                 link_edit_containers.forEach((container) => {
+                    const link_edit_btn = container.querySelector(".edit-link-btn");
+                    if (link_edit_btn.state === "open") {
+                        link_edit_btn.click();
+                    }
                     container.classList.toggle("hidden");
                 });
+            });
+
+            const open_all_links_btn = folder_card.querySelector(".open-all-links-btn");
+            open_all_links_btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const urls = open_all_links_btn.closest(".folder-card").querySelectorAll(".link-url");
+                
+                let openedCount = 0;
+                urls.forEach((url_element) => {
+                    let url = url_element.textContent;
+                    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+                    const newWindow = window.open(url, "_blank");
+                    if (newWindow) {
+                        openedCount++;
+                    }
+                });
+
+                if (openedCount < urls.length) {
+                    // Trigger alert abour popup blocker
+                    alert("Your browser blocked some tabs. Please click the 'Popup Blocked' icon in your address bar and select 'Always allow from LinkVault.'");
+                }
             });
 
             // Set up link edit buttons
             const link_containers = folder_card.querySelectorAll(".link-container");
             link_containers.forEach((container) => {
+                const folder_title = getFolderName(container.closest(".folder-card").querySelector(".folder-card-title").innerHTML);
+                const edit_link_form_folder_select = container.closest(".link-outer-container").querySelector(".edit-form-folder-select");
+                if (folder_title === "Links") {
+                    edit_link_form_folder_select.value = "none";
+                } else {
+                    edit_link_form_folder_select.value = folder_title;
+                }
+                edit_link_form_folder_select.state = edit_link_form_folder_select.value;
+                const link_edit_form = container.closest(".link-outer-container").querySelector(".link-edit-form");
                 const id = container.id;
                 const link_outer_container = container.closest(".link-outer-container");
                 const edit_link_btn = link_outer_container.querySelector(".edit-link-btn");
-                edit_link_btn.value = "closed";
+                const edit_link_accept_btn = link_outer_container.querySelector(".accept-card-title-btn");
+                edit_link_accept_btn.addEventListener("click", async () => {
+                    edit_link_accept_btn.disabled = true;
+                    const link_edit_form = edit_link_accept_btn.closest(".link-outer-container").querySelector(".link-edit-form");
+                    const link_id_input = link_edit_form.querySelector(".edit-form-id");
+                    const link_title_input = link_edit_form.querySelector(".edit-form-title-input");
+                    const link_url_input = link_edit_form.querySelector(".edit-form-url-input");
+                    const link_folder_select = link_edit_form.querySelector(".edit-form-folder-select");
+                    const link_tags_input = link_edit_form.querySelector(".edit-form-tags-input");
+                    link = { };
+                    let folder_changed = false;
+                    if (link_title_input.value !== link_title_input.state) {
+                        link.title = link_title_input.value;
+                        link_title_input.state = link_title_input.value;
+                    }
+                    if (link_url_input.value !== link_url_input.state) {
+                        link.url = link_url_input.value;
+                        link_url_input.state = link_url_input.value;
+                    }
+                    if (link_folder_select.value !== link_folder_select.state) {
+                        folder_changed = true;
+                        link_folder_select.state = link_folder_select.value;
+                    }
+                    if (link_tags_input.value !== link_tags_input.state) {
+                        link.tags = link_tags_input.value.split(',').map(tag => tag.trim()).filter(tag => tag !== "");
+                        link_tags_input.state = link_tags_input.value;
+                    }
+                    if (Object.keys(link).length === 0 && !folder_changed) {
+                        const edit_link_btn = edit_link_accept_btn.closest(".link-outer-container").querySelector(".edit-link-btn");
+                        edit_link_btn.click();
+                        edit_link_accept_btn.disabled = false;
+                        return;
+                    } else {
+                        console.log("Change detected... link: ", link);
+                        if (folder_changed) {
+                            if (!("tags" in link)) {
+                                link.tags = link_tags_input.value.split(',').map(tag => tag.trim()).filter(tag => tag !== "");
+                            }
+                            if (link_folder_select.value !== "none") {
+                                if (link_folder_select.value === "new-folder") {
+                                    const link_new_folder_name_input = link_folder_select.closest(".link-outer-container").querySelector(".edit-form-new-folder-name-input");
+                                    const new_folder_name = link_new_folder_name_input.value;
+                                    link.tags.push(`folder:${new_folder_name}`);
+                                } else {
+                                    link.tags.push(`folder:${link_folder_select.value}`);
+                                }
+                            }
+                        }
+                        try {
+                            const token = localStorage.getItem("token");
+                            const bookmark_id = link_id_input.value;
+                            console.log(`bookmark_id: _${bookmark_id}_`);
+                            const res = await fetch(`${CONFIG.API_BASE_URL}/bookmarks/bookmark/${bookmark_id}`, {
+                                method: "PUT",
+                                headers: { 
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`
+                                },
+                                body: JSON.stringify(link),
+                            });
+                        } catch(err) {
+                            console.log(err);
+                            showError("Internal server error");
+                        } finally {
+                            link_edit_form.submit();
+                        }
+                    }
+                    edit_link_accept_btn.disabled = false;
+                });
+                edit_link_btn.state = "closed";
                 edit_link_btn.addEventListener("click", (e) => {
                     e.stopPropagation();
                     // Enable edit form
-                    const link_edit_form_container = folder_card.querySelector(".link-edit-form-container");
+                    const link_outer_container = edit_link_btn.closest(".link-outer-container");
+                    const link_edit_form_container = link_outer_container.querySelector(".link-edit-form-container");
                     link_edit_form_container.classList.toggle("hidden");
-                    const link_container = folder_card.querySelector(".link-container");
-                    const link_container_expanded = folder_card.querySelector(".link-container-expanded");
-                    if (edit_link_btn.value === "closed") {
+                    const link_container = link_outer_container.querySelector(".link-container");
+                    const link_container_expanded = link_outer_container.querySelector(".link-container-expanded");
+                    if (edit_link_btn.state === "closed") {
                         if (!link_container.classList.contains("hidden")) {
                             link_container.classList.toggle("hidden");
                         }
                         if (!link_container_expanded.classList.contains("hidden")) {
                             link_container_expanded.classList.toggle("hidden");
                         }
-                        edit_link_btn.value = "open";
+                        edit_link_btn.state = "open";
                     } else {
-                        edit_link_btn.value = "closed";
+                        edit_link_btn.state = "closed";
                         if (link_container.classList.contains("hidden")) {
                             link_container.classList.toggle("hidden");
                         }
@@ -372,9 +534,32 @@ document.addEventListener("DOMContentLoaded", async () => {
                     
                 });
                 const delete_link_btn = link_outer_container.querySelector(".delete-link-btn");
-                delete_link_btn.addEventListener("click", (e) => {
+                delete_link_btn.addEventListener("click", async (e) => {
                     e.stopPropagation();
-                    // Delete link
+                    if (!confirm("Are you sure you want to permanently delete this link?")) {
+                        return;
+                    }
+                    try {
+                        const link_container = delete_link_btn.closest(".link-outer-container").querySelector(".link-container");
+                        const link_id = link_container.id;
+                        const token = localStorage.getItem("token");
+                        const res = await fetch(`${CONFIG.API_BASE_URL}/bookmarks/${link_id}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`,
+                            }
+                        });
+                        if (!res.ok) {
+                            showError("There was a problem deleting this link.");
+                            console.log(`response status: ${res.status}`);
+                            return;
+                        }
+                        location.reload();
+                    } catch(err) {
+                        console.log(err);
+                        showError("Internal server error.");
+                    }
                 });
             });
 
@@ -384,6 +569,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
             folder_title_edit_btn.addEventListener("click", () => {
+                folder_title_edit_btn.state = (folder_title_edit_btn.state === "open" ? "closed" : "open");
                 const accept_card_title_btn = folder_card.querySelector(".accept-card-title-btn");
                 const folder_card_title = folder_card.querySelector(".folder-card-title");
                 const card_title_form = folder_card.querySelector(".card-title-form");
@@ -435,7 +621,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 body: JSON.stringify({ old_folder: old_title, new_folder: new_title }),
             });
         } catch (err) {
-            console.log(err);
             showError("Internal server error.");
         }
     }
@@ -450,6 +635,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function buildOuterLinkContainer(link) {
         const link_outer_container = document.createElement("div");
         link_outer_container.classList.add("link-outer-container");
+        link_outer_container.classList.add("blue-outline-hover");
         const link_container = buildLinkElement(link);
         const link_container_expanded = buildExpandedLinkElement(link);
         const link_edit_form_container = buildLinkEditForm(link);
@@ -457,6 +643,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         link_outer_container.appendChild(link_container_expanded);
         link_outer_container.appendChild(link_edit_form_container);
         link_outer_container.addEventListener("click", () => {
+            const folder_card = link_outer_container.closest(".folder-card");
+            if (folder_card.classList.contains("editing")) {
+                return;
+            }
             const link_url = link_outer_container.querySelector(".link-url");
             let url = link_url.textContent;
             if (!/^https?:\/\//i.test(url)) {
@@ -584,11 +774,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const link_id_input = document.createElement("input");
         link_id_input.value = link.id;
         link_id_input.style.display = "none";
+        link_id_input.classList.add("edit-form-id");
         link_edit_form.appendChild(link_id_input);
 
         const link_title_label = document.createElement("label");
         link_title_label.innerHTML = "Link name:";
         link_edit_form.appendChild(link_title_label);
+        
 
         const link_url_label = document.createElement("label");
         link_url_label.innerHTML = "URL:";
@@ -598,6 +790,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         link_folder_label.innerHTML = "Folder:";
         link_edit_form.appendChild(link_folder_label);
 
+        const link_new_folder_name_label = document.createElement("label");
+        link_new_folder_name_label.innerHTML = "Folder name:";
+        link_new_folder_name_label.classList.add("edit-form-new-folder-name-label");
+        link_new_folder_name_label.classList.add("hidden");
+        link_edit_form.appendChild(link_new_folder_name_label);
+
         const link_tags_label = document.createElement("label");
         link_tags_label.innerHTML = "Tags (comma separated):";
         link_edit_form.appendChild(link_tags_label);
@@ -605,14 +803,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         const link_title_input = document.createElement("input");
         link_title_input.type = "text";
         link_title_input.value = link.title;
+        link_title_input.state = link_title_input.value;
+        link_title_input.classList.add("edit-form-title-input");
         link_edit_form.appendChild(link_title_input);
         
         const link_url_input = document.createElement("input");
         link_url_input.type = "text";
         link_url_input.value = link.url;
+        link_url_input.state = link_url_input.value;
+        link_url_input.classList.add("edit-form-url-input");
         link_edit_form.appendChild(link_url_input);
         
         const folder_select = document.createElement("select");
+        folder_select.classList.add("edit-form-folder-select");
         const none_option = document.createElement("option");
         none_option.value = "none";
         none_option.innerHTML = "None";
@@ -631,8 +834,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
         link_edit_form.appendChild(folder_select);
 
+        const link_new_folder_input = document.createElement("input");
+        link_new_folder_input.type = "text";
+        link_new_folder_input.classList.add("edit-form-new-folder-name-input");
+        link_new_folder_input.classList.add("hidden");
+        link_edit_form.appendChild(link_new_folder_input);
+
         const link_tags_input = document.createElement("input");
         link_tags_input.type = "text";
+        link_tags_input.classList.add("edit-form-tags-input");
         let link_tags_input_text = "";
         link.tags.forEach((tag) => {
             if (link_tags_input_text !== "") {
@@ -642,8 +852,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
         link_tags_input.value = link_tags_input_text;
+        link_tags_input.state = link_tags_input.value;
         link_tags_input.placeholder = "tag1,tag2,tag3";
         link_edit_form.appendChild(link_tags_input);
+
+        folder_select.addEventListener("change", (e) => {
+            const new_folder_name_label = link_edit_form.querySelector(".edit-form-new-folder-name-label");
+            const new_folder_name_input = link_edit_form.querySelector(".edit-form-new-folder-name-input");
+            if (e.target.value === "new-folder") {
+                new_folder_name_label.classList.toggle("hidden");
+                new_folder_name_input.classList.toggle("hidden");
+                link_edit_form.classList.toggle("five-rows");
+            } else {
+                if (!new_folder_name_label.classList.contains("hidden")) {
+                    new_folder_name_label.classList.toggle("hidden");
+                    new_folder_name_input.classList.toggle("hidden");
+                    link_edit_form.classList.toggle("five-rows");
+                }
+            }
+        });
 
         link_edit_form_container.appendChild(link_edit_form);
 
@@ -669,6 +896,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         return link_edit_form_container;
     }
 
+/*
+folder_select.addEventListener("change", (e) => {
+        if (e.target.value === "new-folder") {
+            showFolderCreationDiv();
+        }
+        else {
+            hideFolderCreationDiv();
+        }
+    });
+*/
+
     function getFolderNamesAll() {
         const folder_cards = document.querySelectorAll(".folder-card:not(#folder\\:uncategorized)");
         const folder_names = [];
@@ -683,6 +921,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     function getFolderName(full_name) {
         const start = full_name.indexOf("📁 ") + 3;
         const end = full_name.indexOf(" (");
+        if (!full_name.includes("📁")) {
+            return full_name.slice(0, end === -1 ? undefined : end);;
+        }
         return full_name.slice(start, end === -1 ? undefined : end);
     }
 

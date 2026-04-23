@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const data = await res.json();
-            const token = data.access_token;
+            const token = data.token;
             const user = data.user;
 
             localStorage.setItem("token", token);

@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="../../favicon_io/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../../favicon_io/apple-touch-icon.png">
     <link rel="manifest" href="../../favicon_io/site.webmanifest">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=check,delete,edit,settings" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_outward,check,delete,edit,link,link_2,settings" />
 
     <title>LinkVault - Dashboard</title>
     <script src="../../config.js"></script>
@@ -44,10 +44,12 @@
               <div class="form-input-container">
                 <label>Link name:</label>
                 <input type="text" id="link-name" name="link-name">
+                <input type="text" id="link-name-state" name="link-name-state" value="" style="display: none;">
               </div>
               <div class="form-input-container" style="padding-left: 20px;">
                 <label>URL:</label>
                 <input type="text" id="link-url" name="link-url">
+                <input type="text" id="link-url-state" name="link-url-state" value="" style="display: none;">
               </div>
             </div>
             <div style="display: flex; flex-direction: row; padding-bottom: 10px;">
@@ -61,15 +63,17 @@
               <div class="form-input-container" style="padding-left: 20px;">
                 <label>Tags (comma separated):</label>
                 <input type="text" id="link-tags" name="link-tags" placeholder="tag1,tag2,tag3">
+                <input type="text" id="link-tags-state" name="link-tags-state" value="" style="display: none;">
               </div>
               <div id="submit-container">
                 <input type="submit" id="submit-btn" value="Submit">
               </div>
             </div>
-            <div id="folder-creation-container" style="display: flex; flex-direction: row; justify-content: start; padding-bottom: 10px;">
-              <div id="folder-name-input-container" class="form-input-container" style="display: none;">
+            <div id="folder-creation-container" class="folder-creation-container hidden">
+              <div id="folder-name-input-container" class="form-input-container">
                 <label>New folder name:</label>
                 <input type="text" id="folder-name">
+                <input type="text" id="link-folder-name-state" value="" style="display: none;">
               </div>
             </div>
           </form>
@@ -80,14 +84,16 @@
             <div class="folder-card-title-container">
               <span id="uncategorized-title" class="folder-card-title">Links</span>
             </div>
-            <button class="folder-card-settings-btn"><span class="material-symbols-outlined">settings</span></button>
+            <div class="folder-card-header-buttons-container">
+              <button class="open-all-links-btn"><span class="open-all-links-span">Open All </span><span class="open-all-links-icon material-symbols-outlined">arrow_outward</span></button>
+              <button class="folder-card-settings-btn"><span class="material-symbols-outlined">settings</span></button>
+            </div>
           </div>
 
 
           <div class="link-bin">
           </div>
           <div class="drawer-handle">
-            <p>_____________________________________</p>
             <p class="drawer-arrow">&#x25BE;</p>
           </div>
         </div>

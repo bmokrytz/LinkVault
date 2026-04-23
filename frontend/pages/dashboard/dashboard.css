@@ -6,6 +6,10 @@ html, body {
     background-color: rgb(22, 39, 54);
 }
 
+body {
+    overflow-y: auto;
+}
+
 #title {
     font-family: Arial, Helvetica, sans-serif;
     color: white;
@@ -67,7 +71,7 @@ html, body {
     background-color: transparent;
     flex-grow: 1;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -89,7 +93,7 @@ html, body {
 }
 
 .folder-card {
-    width: 1200px;
+    width: min(1200px, 90%);
     min-height: 50px;
     border: 1px solid white;
     border-radius: 10px;
@@ -126,7 +130,7 @@ html, body {
 
 .drawer-handle {
     justify-self: center;
-    width: 500px;
+    width: min(400px, 30%);    
     display: flex;
     user-select: none;
     flex-direction: column;
@@ -137,10 +141,12 @@ html, body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
     color: rgb(163, 163, 163);
+    border-top: 1px solid rgb(163, 163, 163);
 }
 
 .drawer-handle:hover {
     color: white;
+    border-top: 1px solid white;
     cursor: grab;
 }
 
@@ -233,6 +239,17 @@ html, body {
 
 #folder-name-input {
     width: 50%;
+}
+
+.folder-creation-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    padding-bottom: 10px;
+}
+
+.folder-creation-container.hidden {
+    display: none;
 }
 
 #submit-container {
@@ -505,6 +522,10 @@ html, body {
     justify-content: space-between;
 }
 
+.blue-outline-hover:hover {
+    border: 1px solid rgb(15, 118, 253);
+}
+
 .link-container {
     border: none;
     display: flex;
@@ -657,11 +678,54 @@ html, body {
     padding: 0px 0px 0px 0px;
 }
 
+.link-edit-form.five-rows {
+    grid-template-columns: repeat(5, auto);
+}
+
 .link-edit-form label {
     font-family: Arial, Helvetica, sans-serif;
     color: white;
     font-size: 20px;
 }
+
+.edit-form-new-folder-name-label.hidden {
+    display: none;
+}
+
+.edit-form-new-folder-name-input.hidden {
+    display: none;
+}
+
+.folder-card-header-buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+.open-all-links-btn {
+    border: none;
+    border-radius: 10px;
+    background-color: rgb(39, 112, 214);
+}
+
+.open-all-links-btn:hover {
+    background-color: rgb(45, 130, 250);
+}
+
+.open-all-links-span {
+    font-size: 15px;
+    color: white;
+}
+
+.open-all-links-icon {
+    vertical-align: middle;
+    color: white;
+    font-size: 20px;
+}
+
+
 
 /*
 .link-container-right {
