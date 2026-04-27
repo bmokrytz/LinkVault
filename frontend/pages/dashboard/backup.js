@@ -1,86 +1,3 @@
-import * as Api from "./api.js";
-import * as Builder from "./builder.js";
-import * as Handler from "./handler.js";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", async () => {
 
     // Verify that user is authenticated
@@ -88,16 +5,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!token) {
         window.location.href = "../../index.html"
     }
-
     const email = localStorage.getItem("login_email");
     const signed_in_user = document.getElementById("signed-in-user");
     signed_in_user.textContent = email;
 
     // Fetch user's links
-    const links = await Api.fetchLinks(token);
-    Builder.injectLinks(links);
-    Handler.addLinkHandlers();
+    const links = await fetchLinks(token);
+    insertLinks(links);
+    setLinkCountDisplay();
     setupFolderCardButtons();
+
+    // Error message functionality
+    function showError(message) {
+        alert(message);
+    }
+    function hideError() {
+        const error_msg = document.getElementById("error-msg");
+        error_msg.textContent = "";
+        error_msg.style.display = "none";
+    }
 
     // Sign out button functionality
     const sign_out_btn = document.getElementById("sign-out-btn");
@@ -238,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (folders.length === 0) {
                 folders.push("uncategorized");
             }
-            Builder.buildFolderCards(folders);
+            buildFolderCards(folders);
             link.link_folders.forEach((folder) => insertLinkIntoFolder(link, folder));
         } catch (err) {
             showError("Internal server error");
@@ -278,13 +204,164 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
- 
+    // Fetch the user's links from database
+    async function fetchLinks(token) {
+        const userID = localStorage.getItem("userID");
+        
+        try {
+            const res = await fetch(`${CONFIG.API_BASE_URL}/bookmarks`, {
+                method: "GET",
+                headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+            });
+            if (!res.ok) {
+                showError("Internal server error");
+                return [];
+            }
+            const data = await res.json();
+            const bookmarks = data.bookmarks;
+            return bookmarks;
+        } catch(err) {
+            showError("Internal server error.");
+            return [];
+        }
+    }
 
+    // Insert links into page
+    function insertLinks(links) {
+        const folders = [];
+        links.forEach((link) => {
+            const result = findLinkFolders(link.tags);
+            link.tags = result.tags;
+            link.link_folders = result.link_folders;
+            link.link_folders.forEach((folder) => {
+                if (!folders.includes(folder)) {
+                    folders.push(folder);
+                }
+            });
+        });
+        buildFolderCards(folders);
+        links.forEach((link) => {
+            link.link_folders.forEach((folder) => insertLinkIntoFolder(link, folder));
+        });
+    }
 
+    function findLinkFolders(tags) {
+        const remaining_tags = [];
+        const link_folders = [];
+        tags.forEach((tag) => {
+            if (/^folder:.+$/.test(tag)) {
+                link_folders.push(tag.replace("folder:", ""));
+            } else {
+                remaining_tags.push(tag);
+            }
+        });
+        if (link_folders.length === 0) {
+            link_folders.push("uncategorized");
+        }
+        return { tags: remaining_tags, link_folders };
+    }
 
-    
+    function buildFolderCards(folders) {
+        const root = document.getElementById("root");
+        folders.forEach((folder) => {
+            if (folder === "uncategorized") {
+                return;
+            }
+            // Build folder card
+            const folder_card = document.createElement("div");
+            folder_card.classList.add("folder-card");
+            folder_card.setAttribute('id', `folder:${folder}`);
 
-    
+            // Build folder card header container
+            const folder_card_header_container = document.createElement("div");
+            folder_card_header_container.classList.add("folder-card-header-container");
+
+            // Build folder title container
+            const folder_card_title_container = document.createElement("div");
+            folder_card_title_container.classList.add("folder-card-title-container");
+            
+            const folder_card_title = document.createElement("span");
+            folder_card_title.classList.add("folder-card-title");
+            folder_card_title.innerHTML = `📁 ${folder}`;
+            folder_card_title_container.appendChild(folder_card_title);
+            const card_title_form = document.createElement("form");
+            card_title_form.classList.add("card-title-form");
+            card_title_form.classList.add("hidden");
+            const card_title_form_input = document.createElement("input");
+            card_title_form_input.classList.add("card-title-form-input");
+            card_title_form.appendChild(card_title_form_input);
+            folder_card_title_container.appendChild(card_title_form);
+            const folder_card_edit_btn = document.createElement("button");
+            folder_card_edit_btn.classList.add("folder-title-edit-btn");
+            folder_card_edit_btn.classList.add("hidden");
+            folder_card_title.state = "closed";
+            const folder_card_edit_btn_icon = document.createElement("span");
+            folder_card_edit_btn_icon.classList.add("material-symbols-outlined");
+            folder_card_edit_btn_icon.classList.add("folder-title-edit-btn-icon");
+            folder_card_edit_btn_icon.innerHTML = "edit";
+            folder_card_edit_btn.appendChild(folder_card_edit_btn_icon);
+            const accept_card_title_btn = document.createElement("button");
+            accept_card_title_btn.classList.add("accept-card-title-btn");
+            accept_card_title_btn.classList.add("hidden");
+            const accept_card_title_btn_icon = document.createElement("span");
+            accept_card_title_btn_icon.classList.add("material-symbols-outlined");
+            accept_card_title_btn_icon.classList.add("accept-card-title-icon");
+            accept_card_title_btn_icon.innerHTML = "check";
+            accept_card_title_btn.appendChild(accept_card_title_btn_icon);
+            folder_card_title_container.appendChild(folder_card_edit_btn);
+            folder_card_title_container.appendChild(accept_card_title_btn);
+            folder_card_header_container.appendChild(folder_card_title_container);
+
+            const folder_card_header_buttons_container = document.createElement("div");
+            folder_card_header_buttons_container.classList.add("folder-card-header-buttons-container");
+            const open_all_links_btn = document.createElement("button");
+            open_all_links_btn.classList.add("open-all-links-btn");
+            const open_all_links_btn_span = document.createElement("span");
+            open_all_links_btn_span.classList.add("open-all-links-span");
+            open_all_links_btn_span.innerHTML = "Open All ";
+            const open_all_links_btn_span_icon = document.createElement("span");
+            open_all_links_btn_span_icon.classList.add("open-all-links-icon");
+            open_all_links_btn_span_icon.classList.add("material-symbols-outlined");
+            open_all_links_btn_span_icon.innerHTML = "arrow_outward";
+
+            open_all_links_btn.appendChild(open_all_links_btn_span);
+            open_all_links_btn.appendChild(open_all_links_btn_span_icon);
+            folder_card_header_buttons_container.appendChild(open_all_links_btn);
+
+            // Build folder card settings button
+            const folder_card_settings_btn = document.createElement("button");
+            folder_card_settings_btn.classList.add("folder-card-settings-btn");
+            folder_card_settings_btn.classList.add("hidden");
+            const folder_card_settings_btn_icon = document.createElement("span");
+            folder_card_settings_btn_icon.classList.add("material-symbols-outlined");
+            folder_card_settings_btn_icon.innerHTML = "settings";
+            folder_card_settings_btn.appendChild(folder_card_settings_btn_icon);
+            folder_card_header_buttons_container.appendChild(folder_card_settings_btn);
+            folder_card_header_container.appendChild(folder_card_header_buttons_container);
+
+            // Add folder card header container to folder card
+            folder_card.appendChild(folder_card_header_container);
+
+            // Build link bin
+            const link_bin = document.createElement("div");
+            link_bin.classList.add("link-bin");
+            folder_card.appendChild(link_bin);
+
+            // Build drawer handle
+            const drawer_handle = document.createElement("div");
+            drawer_handle.classList.add("drawer-handle");
+            const p = document.createElement("p");
+            p.classList.add("drawer-arrow");
+            p.innerHTML = "&#x25BE;";
+            drawer_handle.appendChild(p);
+            folder_card.appendChild(drawer_handle);
+
+            root.appendChild(folder_card);
+        });
+    }
 
 
 
@@ -548,7 +625,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-
+    function insertLinkIntoFolder(link, folder) {
+        const folder_card = document.getElementById(`folder:${folder}`);
+        const link_bin = folder_card.querySelector(`.link-bin`);
+        const outer_link_container = buildOuterLinkContainer(link);
+        link_bin.appendChild(outer_link_container);
+    }
 
     function buildOuterLinkContainer(link) {
         const link_outer_container = document.createElement("div");
@@ -870,33 +952,18 @@ folder_select.addEventListener("change", (e) => {
     });
 
 
+    function setLinkCountDisplay() {
+        const folder_cards = document.querySelectorAll(".folder-card");
+        folder_cards.forEach((folder_card) => {
+            const num_links = folder_card.querySelectorAll(".link-outer-container").length;
+            const folder_card_title = folder_card.querySelector(".folder-card-title");
+            folder_card_title.textContent += ` (${num_links})`;
+        });
+    }
 
 
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
