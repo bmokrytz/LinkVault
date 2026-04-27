@@ -102,6 +102,9 @@ export function setPanelOpen(panel) {
     openPanels.add(panel);
 }
 
+export function setPanelClosed(panel) {
+    openPanels.delete(panel);
+}
 
 
 // Building links
@@ -163,7 +166,7 @@ function buildFolderCards(folder_names) {
     });
 }
 
-export function buildLink(link) {
+function buildLink(link) {
     const fragment = link_template.content.cloneNode(true);
     const link_outer_container = fragment.querySelector(".link-outer-container");
     link_outer_container.setAttribute("id", link.id);
@@ -179,15 +182,34 @@ function setupLinkEditForm(link_outer_container, link) {
     link_outer_container.dataset.link_title = link.title;
     link_outer_container.dataset.link_url = link.url;
     const current_folder_name = getFolderCardName(link_outer_container.closest(".folder-card"));
-    link_outer_container.dataset.selected_folder = current_folder_name;
-    const folder_select = link_outer_container.querySelector(".edit-form-folder-select");
-
-    const folder_names = getAllFolderCardNames();
-    folder_names.forEach((folder_name) => {
-        const select_option = document.createElement("option");
-        select_option.value = folder_name;
-        select_option.innerHTML = folder_name;
-        folder_select.appendChild(select_option);
+    getAllFolderCardNames().forEach((name) =>{
+        console.log("name: ", name);
+    });
+    if (current_folder_name === "uncategorized") {
+        link_outer_container.querySelector(".edit-form-folder-select").dataset.default_value = "none";
+        link_outer_container.querySelector(".edit-form-folder-select").value = "none";
+    } else {
+        link_outer_container.querySelector(".edit-form-folder-select").dataset.default_value = current_folder_name;
+        link_outer_container.querySelector(".edit-form-folder-select").value = current_folder_name;
+    }
+    if (link.tags.length !== 0) {
+        let tags_string = "";
+        link.tags.forEach((tag) => {
+            if (tags_string === ""){
+                tags_string += `${tag}`;
+            } else {
+                tags_string += `,${tag}`;
+            }
+        });
+        link_outer_container.querySelector(".edit-form-tags-input").value = tags_string;
+    }
+    getAllFolderCardNames().forEach((folder_name) => {
+        const select_option = document.createElement("select");
+        if (folder_name !== "uncategorized") {
+            select_option.value = folder_name;
+            select_option.textContent = folder_name;
+        }
+        link_outer_container.querySelector(".edit-form-folder-select").appendChild(select_option);
     });
 }
 

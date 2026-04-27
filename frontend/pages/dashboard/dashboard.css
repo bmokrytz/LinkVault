@@ -664,6 +664,7 @@ body {
 .link-edit-form-container {
     display: flex;
     flex-direction: row;
+    overflow: auto;
 }
 
 .link-edit-form-container.hidden {
