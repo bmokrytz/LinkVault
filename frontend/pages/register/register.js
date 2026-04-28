@@ -14,10 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const error_msg_p = document.getElementById("error-msg");
     function showError(message) {
         error_msg_p.textContent = message;
-        error_msg_container.display = "block";
+        error_msg_container.style.display = "block";
     }
-    function hideError(message) {
-        error_msg_container.display = "none";
+    function hideError() {
+        error_msg_container.style.display = "none";
     }
 
     // Form input validation
@@ -47,8 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
             showError("Please enter a valid email address.");
             return;
         }
-        const password = document.getElementById("password").value.trim();
-        const password_conf = document.getElementById("password-conf").value.trim();
+        const password = document.getElementById("password").value;
+        const password_conf = document.getElementById("password-conf").value;
         if (!isPasswordMatch(password, password_conf)) {
             showError("Passwords do not match.");
             return;
@@ -82,8 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             window.location.href = "../dashboard/dashboard.html";
         } catch (err) {
-            console.log(err);
-            showError("Internal server error.");
+            showError("Internal server error");
         } finally {
             enableSubmitBtn(submit_btn);
         }

@@ -1,5 +1,8 @@
 const folderNames = new Map();
+const uncategorized_folder = document.getElementById("folder:uncategorized");
+setFolderCardName(uncategorized_folder, "uncategorized");
 const openPanels = new Set();
+
 
 const folder_card_template = document.createElement("template");
 folder_card_template.innerHTML = `
@@ -94,6 +97,10 @@ export function getAllFolderCardNames() {
     return [...folderNames.values()];
 }
 
+export function setFolderCardName(folder_card, folder_name) {
+    folderNames.set(folder_card, folder_name);
+}
+
 export function isPanelOpen(panel) {
     return openPanels.has(panel);
 }
@@ -125,6 +132,7 @@ export function injectLinks(links) {
         link.link_folders.forEach((folder) => insertLinkIntoFolder(link, folder));
     });
     setLinkCountDisplay();
+    setLinkCreationFormDefaults();
 }
 
 function findLinkFolders(tags) {
@@ -147,23 +155,32 @@ function insertLinkIntoFolder(link, folder) {
     const folder_card = document.getElementById(`folder:${folder}`);
     const link_bin = folder_card.querySelector(`.link-bin`);
     const link_outer_container = buildLink(link);
-    link_outer_container.dataset.link = link;
+    //link_outer_container.dataset.link = JSON.stringify(link);
     link_bin.appendChild(link_outer_container);
+    setupLinkEditForm(link_outer_container, link);
 }
 
 function buildFolderCards(folder_names) {
     const root = document.getElementById("root");
     folder_names.forEach((folder_name) => {
-        if (folder_name === "uncategorized") {
+        if (folder_name === "uncategorized" || isFolderBuilt(folder_name)) {
             return;
         }
         const fragment = folder_card_template.content.cloneNode(true);
         const folder_card = fragment.querySelector(".folder-card");
         folder_card.setAttribute('id', `folder:${folder_name}`);
-        folderNames.set(folder_card, folder_name);
+        setFolderCardName(folder_card, folder_name);
         folder_card.querySelector(".folder-card-title").textContent = `📁 ${folder_name}`;
         root.appendChild(folder_card);
     });
+}
+
+function isFolderBuilt(folder_name) {
+    const existing_folder = document.getElementById(`folder:${folder_name}`);
+    if (existing_folder === null) {
+        return false;
+    }
+    return true;
 }
 
 function buildLink(link) {
@@ -173,44 +190,59 @@ function buildLink(link) {
     setLinkTitle(link_outer_container, link.title);
     setLinkUrl(link_outer_container, link.url);
     buildLinkTags(link_outer_container, link.tags);
-    setupLinkEditForm(link_outer_container, link);
     return link_outer_container;
 }
 
 function setupLinkEditForm(link_outer_container, link) {
-    link_outer_container.dataset.link_id = link.id;
-    link_outer_container.dataset.link_title = link.title;
-    link_outer_container.dataset.link_url = link.url;
-    const current_folder_name = getFolderCardName(link_outer_container.closest(".folder-card"));
-    getAllFolderCardNames().forEach((name) =>{
-        console.log("name: ", name);
-    });
-    if (current_folder_name === "uncategorized") {
-        link_outer_container.querySelector(".edit-form-folder-select").dataset.default_value = "none";
-        link_outer_container.querySelector(".edit-form-folder-select").value = "none";
-    } else {
-        link_outer_container.querySelector(".edit-form-folder-select").dataset.default_value = current_folder_name;
-        link_outer_container.querySelector(".edit-form-folder-select").value = current_folder_name;
-    }
-    if (link.tags.length !== 0) {
-        let tags_string = "";
-        link.tags.forEach((tag) => {
-            if (tags_string === ""){
-                tags_string += `${tag}`;
-            } else {
-                tags_string += `,${tag}`;
-            }
-        });
-        link_outer_container.querySelector(".edit-form-tags-input").value = tags_string;
-    }
+    setLinkTagsInputText(link_outer_container, link);
+    setLinkEditFormFolderSelectOptions(link_outer_container, link);
+    setLinkEditFormValuesAndDefaults(link_outer_container, link);
+}
+
+function setLinkEditFormFolderSelectOptions(link_outer_container, link) {
     getAllFolderCardNames().forEach((folder_name) => {
-        const select_option = document.createElement("select");
+        const select_option = document.createElement("option");
         if (folder_name !== "uncategorized") {
             select_option.value = folder_name;
             select_option.textContent = folder_name;
+            link_outer_container.querySelector(".edit-form-folder-select").appendChild(select_option);
         }
-        link_outer_container.querySelector(".edit-form-folder-select").appendChild(select_option);
     });
+}
+
+function setLinkEditFormValuesAndDefaults(link_outer_container, link) {
+    link_outer_container.querySelector(".edit-form-id").value = link.id;
+    link_outer_container.querySelector(".link-edit-form").dataset.link_id = link.id;
+    link_outer_container.querySelector(".edit-form-title-input").value = link.title;
+    link_outer_container.querySelector(".link-edit-form").dataset.link_title = link.title;
+    link_outer_container.querySelector(".edit-form-url-input").value = link.url;
+    link_outer_container.querySelector(".link-edit-form").dataset.link_url = link.url;
+    const folder_name = getFolderCardName(link_outer_container.closest(".folder-card"));
+    if (folder_name === "uncategorized") {
+        link_outer_container.querySelector(".edit-form-folder-select").value = "none";
+        link_outer_container.querySelector(".edit-form-folder-select").dataset.default_value = "none";
+    } else {
+        link_outer_container.querySelector(".edit-form-folder-select").value = folder_name;
+        link_outer_container.querySelector(".edit-form-folder-select").dataset.default_value = folder_name;
+    }
+}
+
+function setLinkTagsInputText(link_outer_container, link) {
+    if (link.tags.length === 0) {
+        return;
+    }
+    const tags = link.tags;
+    const link_tags_input = link_outer_container.querySelector(".edit-form-tags-input");
+    let link_tags_input_text = "";
+    link.tags.forEach((tag) => {
+        if (link_tags_input_text !== "") {
+            link_tags_input_text += `,${tag}`;
+        } else{
+            link_tags_input_text += `${tag}`;
+        }
+    });
+    link_tags_input.value = link_tags_input_text;
+    link_outer_container.querySelector(".link-edit-form").dataset.link_tags = link_tags_input.value;
 }
 
 function buildLinkTags(link_outer_container, tags_list) {
@@ -230,7 +262,6 @@ function buildLinkTags(link_outer_container, tags_list) {
             const tag = fragment.querySelector(".tag");
             tag.querySelector("p").textContent = link_tag;
             tags_container.appendChild(tag);
-            const link_container_right = link_container.querySelector(".link-container-right");
         });
     }
     const tags_container_expanded = link_container_expanded.querySelector(".tags-container-expanded");
@@ -253,26 +284,86 @@ function setLinkUrl(link_outer_container, URL) {
     link_outer_container.querySelector(".link-url-expanded").textContent = URL;
 }
 
-function setLinkTagsInputText(link_outer_container, link) {
-    const tags = link.tags;
-    const link_tags_input = link_outer_container.querySelector(".edit-form-tags-input");
-    let link_tags_input_text = "";
-    link.tags.forEach((tag) => {
-        if (link_tags_input_text !== "") {
-            link_tags_input_text += `,${tag}`;
-        } else{
-            link_tags_input_text += `${tag}`;
-        }
-    });
-    link_tags_input.value = link_tags_input_text;
-    link_outer_container.dataset.link_tags = link_tags_input.value;
-}
-
 function setLinkCountDisplay() {
     const folder_cards = document.querySelectorAll(".folder-card");
     folder_cards.forEach((folder_card) => {
         const num_links = folder_card.querySelectorAll(".link-outer-container").length;
         const folder_card_title = folder_card.querySelector(".folder-card-title");
-        folder_card_title.textContent += ` (${num_links})`;
+        folder_card.dataset.link_count = num_links;
+        const folder_name = getFolderCardName(folder_card);
+        if (folder_name === "uncategorized") {
+            folder_card_title.textContent = `Links (${num_links})`;
+        } else {
+            folder_card_title.textContent = `📁 ${folder_name} (${num_links})`;
+        }
     });
+}
+
+export function setLinkCreationFormDefaults() {
+    const link_form = document.getElementById("add-link-form");
+    link_form.dataset.link_name_default = "";
+    link_form.dataset.link_url_default = "";
+    link_form.dataset.folder_select_default = "none";
+    link_form.dataset.folder_name_default = "";
+    link_form.dataset.link_tags_default = "";
+}
+
+export function resetLinkCreationForm() {
+    const link_form = document.getElementById("add-link-form");
+    link_form.querySelector("#link-name").value = link_form.dataset.link_name_default;
+    link_form.querySelector("#link-url").value = link_form.dataset.link_url_default;
+    link_form.querySelector("#folder-select").value = link_form.dataset.folder_select_default;
+    link_form.querySelector("#folder-name").value = link_form.dataset.folder_name_default;
+    link_form.querySelector("#link-tags").value = link_form.dataset.link_tags_default;
+}
+
+export function showFolderCreationDiv() {
+    const folder_creation_container = document.getElementById("folder-creation-container");
+    if (folder_creation_container.classList.contains("hidden")) {
+        folder_creation_container.classList.toggle("hidden");
+    }
+}
+
+export function hideFolderCreationDiv() {
+    const folder_creation_container = document.getElementById("folder-creation-container");
+    if (!folder_creation_container.classList.contains("hidden")) {
+        folder_creation_container.classList.toggle("hidden");
+    }
+}
+
+export function disableSignOutBtn(sign_out_btn) {
+    sign_out_btn.disabled = true;
+    sign_out_btn.textContent = "Signing out...";
+    sign_out_btn.style.opacity = "0.7";
+}
+
+export function disableSubmitBtn() {
+    const submit_btn = document.getElementById("submit-btn");
+    submit_btn.disabled = true;
+    submit_btn.value = "Adding link...";
+    submit_btn.style.opacity = "0.7";
+}
+
+export function enableSubmitBtn() {
+    const submit_btn = document.getElementById("submit-btn");
+    submit_btn.disabled = false;
+    submit_btn.value = "Submit";
+    submit_btn.style.opacity = "1";
+}
+
+export function buildNewLink(link) {
+    const result = findLinkFolders(link.tags);
+    link.tags = result.tags;
+    link.link_folders = result.link_folders;
+    const folders = [];
+    link.link_folders.forEach((folder) => {
+        if (!folders.includes(folder)) {
+            folders.push(folder);
+        }
+    });
+    if (folders.length === 0) {
+        folders.push("uncategorized");
+    }
+    buildFolderCards(folders);
+    link.link_folders.forEach((folder) => insertLinkIntoFolder(link, folder));
 }

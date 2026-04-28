@@ -37,19 +37,16 @@
         <div id="add-link-form-container">
           <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <p>Add link details</p>
-            <p id="error-msg" style="display: none;"></p>
           </div>
           <form id="add-link-form">
             <div style="display: flex; flex-direction: row;">
               <div class="form-input-container">
                 <label>Link name:</label>
                 <input type="text" id="link-name" name="link-name">
-                <input type="text" id="link-name-state" name="link-name-state" value="" style="display: none;">
               </div>
               <div class="form-input-container" style="padding-left: 20px;">
                 <label>URL:</label>
                 <input type="text" id="link-url" name="link-url">
-                <input type="text" id="link-url-state" name="link-url-state" value="" style="display: none;">
               </div>
             </div>
             <div style="display: flex; flex-direction: row; padding-bottom: 10px;">
@@ -63,7 +60,6 @@
               <div class="form-input-container" style="padding-left: 20px;">
                 <label>Tags (comma separated):</label>
                 <input type="text" id="link-tags" name="link-tags" placeholder="tag1,tag2,tag3">
-                <input type="text" id="link-tags-state" name="link-tags-state" value="" style="display: none;">
               </div>
               <div id="submit-container">
                 <input type="submit" id="submit-btn" value="Submit">
@@ -73,7 +69,6 @@
               <div id="folder-name-input-container" class="form-input-container">
                 <label>New folder name:</label>
                 <input type="text" id="folder-name">
-                <input type="text" id="link-folder-name-state" value="" style="display: none;">
               </div>
             </div>
           </form>
