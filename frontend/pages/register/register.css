@@ -73,21 +73,6 @@ html, body {
     padding-bottom: 20px;
 }
 
-#error-msg-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-
-#error-msg {
-    color: red;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
-}
-
 #submit-container {
     display: flex;
     flex-direction: row;
@@ -130,4 +115,12 @@ html, body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
     color: rgb(9, 19, 36);
+}
+
+#email-verification-message-container.hidden {
+    display: none;
+}
+
+#register-form.hidden {
+    display: none;
 }

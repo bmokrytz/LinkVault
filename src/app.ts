@@ -10,6 +10,7 @@ import bookmarksRouter from "./routes/bookmarks";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1);
 
 const allowed_origins = process.env.ALLOWED_ORIGINS?.split(",");
 
@@ -34,6 +35,12 @@ app.use(
 );
 app.use(globalLimiter);
 app.use(authLimiter);
+app.use((req, res, next) => {
+  if (req.body instanceof Buffer) {
+    req.body = JSON.parse(req.body.toString());
+  }
+  next();
+});
 app.use(express.json());
 
 app.get("/health", (req, res) => {
