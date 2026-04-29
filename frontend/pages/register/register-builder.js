@@ -29,7 +29,7 @@ register_container_template.innerHTML = `
 const email_verification_message_container_template = document.createElement("template");``
 email_verification_message_container_template.innerHTML = `
     <div id="verify-container" class="hidden">
-        <span id="verification-message"></span>
+        <span class="verification-message"></span>
         <button id="login-btn">Sign in</button>
     </div>
     `;
@@ -65,7 +65,14 @@ export function showError(message) {
 
 export function showEmailVerificationMessage(message) {
     document.getElementById("register-container").classList.toggle("hidden");
-    document.getElementById("verify-container").classList.toggle("hidden");
-    console.log("Message: ", message);
-    document.getElementById("verification-message").textContent = message;
+    const verify_container = document.getElementById("verify-container");
+    verify_container.classList.toggle("hidden");
+    const button = document.getElementById("login-btn");
+    message.split("\n").forEach((msg) => {
+        const span = document.createElement("span");
+        span.classList.add("verification-message");
+        span.textContent = msg;
+        verify_container.insertBefore(span, verify_container.lastChild);
+    });
+
 }

@@ -48,7 +48,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
       return;
     }
     
-    res.status(201).json({ message: `A verification email has been sent to ${email}.\n\nPlease check your inbox for a verification link.` });
+    res.status(201).json({ message: `A verification email has been sent to ${email}.\nPlease check your inbox for a verification link.` });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
