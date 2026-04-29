@@ -68,11 +68,12 @@ export function showEmailVerificationMessage(message) {
     const verify_container = document.getElementById("verify-container");
     verify_container.classList.toggle("hidden");
     const button = document.getElementById("login-btn");
+    button.remove();
     message.split("\n").forEach((msg) => {
         const span = document.createElement("span");
         span.classList.add("verification-message");
         span.textContent = msg;
-        verify_container.insertBefore(span, verify_container.lastChild);
+        verify_container.appendChild(span);
     });
-
+    verify_container.appendChild(button);
 }
