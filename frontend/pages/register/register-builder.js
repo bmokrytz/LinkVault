@@ -26,15 +26,11 @@ register_container_template.innerHTML = `
     </div>
     `;
 
-const email_verification_message_container_template = document.createElement("template");
+const email_verification_message_container_template = document.createElement("template");``
 email_verification_message_container_template.innerHTML = `
-    <div id="email-verification-message-container" class="hidden">
-        <span class="email-verification-message"></span>
-        <div class="email-verification-button-box">
-            <button class="resend-verification-email-btn">
-                <span class="resend-verification-email-content"></span>
-            </button>
-        </div>
+    <div id="verify-container" class="hidden">
+        <span id="verification-message"></span>
+        <button id="login-btn">Sign in</button>
     </div>
     `;
 let register_container;
@@ -46,7 +42,8 @@ export function buildContainers() {
     register_container = fragment.querySelector("#register-container");
     root.appendChild(register_container);
     const email_verification_fragment = email_verification_message_container_template.content.cloneNode(true);
-    email_verification_message_container = email_verification_fragment.querySelector("#email-verification-message-container");
+    email_verification_message_container = email_verification_fragment.querySelector("#verify-container");
+    root.appendChild(email_verification_message_container);
 }
 
 export function disableSubmitBtn() {
@@ -64,4 +61,11 @@ export function enableSubmitBtn() {
 
 export function showError(message) {
     alert(message);
+}
+
+export function showEmailVerificationMessage(message) {
+    document.getElementById("register-container").classList.toggle("hidden");
+    document.getElementById("verify-container").classList.toggle("hidden");
+    console.log("Message: ", message);
+    document.getElementById("verification-message").textContent = message;
 }

@@ -48,7 +48,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
       return;
     }
     
-    res.status(201).json({ message: "Verification email sent" });
+    res.status(201).json({ message: `A verification email has been sent to ${email}.\n\nPlease check your inbox for a verification link.` });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -64,7 +64,7 @@ router.get("/verify/:verification_token", async (req: Request, res: Response): P
       [verification_token],
     );
     if (result.rows.length === 0 || new Date() > result.rows[0].verification_token_expires) {
-      res.status(400).json({ error: "Verification token expired. Please request a new verification email." });
+      res.status(400).json({ error: "Verification token expired. Sign in again to request a new verification email." });
       return;
     }
     const userID = result.rows[0].id;
@@ -74,7 +74,7 @@ router.get("/verify/:verification_token", async (req: Request, res: Response): P
       WHERE id = $1`,
       [userID],
     );
-    res.status(200).json({ message: "Thank you for verifying your account. You may log into LinkVault now." });
+    res.status(200).json({ message: "Thank you for verifying your account. You may sign into LinkVault now." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });

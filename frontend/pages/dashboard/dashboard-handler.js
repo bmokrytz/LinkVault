@@ -1,5 +1,5 @@
-import * as Builder from "./builder.js";
-import * as Api from "./api.js";
+import * as Builder from "./dashboard-builder.js";
+import * as Api from "./dashboard-api.js";
 
 export function setupAllHandlers() {
     addLinkHandlers();

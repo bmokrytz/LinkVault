@@ -1,6 +1,6 @@
-import * as Api from "./api.js";
-import * as Builder from "./builder.js";
-import * as Handler from "./handler.js";
+import * as Api from "./dashboard-api.js";
+import * as Builder from "./dashboard-builder.js";
+import * as Handler from "./dashboard-handler.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
 

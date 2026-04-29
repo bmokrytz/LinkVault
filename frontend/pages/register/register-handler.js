@@ -3,6 +3,7 @@ import * as Api from "./register-api.js";
 
 export async function setupHandlers() {
     backButtonHandler();
+    signInButtonHandler();
     await registerFormSubmitHandler();
 }
 
@@ -18,6 +19,7 @@ async function registerFormSubmitHandler() {
     const submit_btn = document.getElementById("submit-btn");
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        Builder.disableSubmitBtn();
 
         const email = document.getElementById("email").value.trim();
         if (!isValidEmail(email)) {
@@ -34,9 +36,22 @@ async function registerFormSubmitHandler() {
             Builder.showError("Password must be at least 8 characters.");
             return;
         }
-        Builder.disableSubmitBtn();
 
         const response = await Api.register(email, password);
+        const data = await response.json();
+        if (response !== null) {
+            if (response.status !== 201) {
+                alert(data.error);
+            } else {
+                Builder.showEmailVerificationMessage(data.message);
+            }
+        }
+    });
+}
+
+function signInButtonHandler() {
+    document.getElementById("login-btn").addEventListener("click", () => {
+        window.location.href = "../../pages/login/login.html";
     });
 }
 
