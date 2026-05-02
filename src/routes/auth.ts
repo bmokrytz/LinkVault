@@ -63,7 +63,11 @@ router.get("/verify/:verification_token", async (req: Request, res: Response): P
       "SELECT * FROM users WHERE verification_token = $1",
       [verification_token],
     );
-    if (result.rows.length === 0 || new Date() > result.rows[0].verification_token_expires) {
+    if (result.rows.length === 0) {
+      res.status(400).json({ error: "Invalid verification token. Sign in again to request a new verification email." });
+      return;
+    }
+    if (new Date() > result.rows[0].verification_token_expires) {
       res.status(400).json({ error: "Verification token expired. Sign in again to request a new verification email." });
       return;
     }
