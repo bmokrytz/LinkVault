@@ -27,21 +27,25 @@ const authLimiter = rateLimit({
 });
 
 app.use(helmet());
+
 app.use(
   cors({
     origin: allowed_origins,
     credentials: true,
   }),
 );
-app.use(globalLimiter);
-app.use(authLimiter);
+
 app.use((req, res, next) => {
   if (req.body instanceof Buffer) {
-    req.body = JSON.parse(req.body.toString());
+    console.log("Request body: ", JSON.parse(req.body.toString()));
   }
   next();
 });
+
 app.use(express.json());
+
+app.use(globalLimiter);
+app.use(authLimiter);
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
