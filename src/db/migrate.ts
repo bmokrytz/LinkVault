@@ -4,6 +4,8 @@ const migrate = async () => {
   const client = await pool.connect();
 
   try {
+    await client.query('BEGIN');  // Start migration transaction
+
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -37,8 +39,15 @@ const migrate = async () => {
       );
     `);
 
+    await client.query('COMMIT');  // End migration transaction and save permanently
+
     console.log("Migration complete");
   } catch (err) {
+    try {
+      await client.query('ROLLBACK');   // Undo transaction because of error
+    } catch (err) {
+      console.error("Database connection failed, unable to rollback migration:", err);
+    }
     console.error("Migration failed:", err);
   } finally {
     client.release();
