@@ -44,12 +44,12 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use(globalLimiter);
-app.use(authLimiter);
-
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use(globalLimiter);
+authRouter.use(authLimiter);
 
 app.use("/auth", authRouter);
 app.use("/bookmarks", authenticate, bookmarksRouter);
