@@ -7,7 +7,7 @@ import { authenticate } from "./middleware/auth";
 import authRouter from "./routes/auth";
 import bookmarksRouter from "./routes/bookmarks";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const app = express();
 app.set("trust proxy", 1);
@@ -48,8 +48,10 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use(globalLimiter);
-authRouter.use(authLimiter);
+if (process.env.NODE_ENV !== "TEST") {
+  app.use(globalLimiter);
+  authRouter.use(authLimiter);
+}
 
 app.use("/auth", authRouter);
 app.use("/bookmarks", authenticate, bookmarksRouter);

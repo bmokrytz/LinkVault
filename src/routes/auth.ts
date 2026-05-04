@@ -11,7 +11,7 @@ const router = Router();
 router.post("/register", async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (!email || email === "" || !password || password === "") {
     res.status(400).json({ error: "Email and password are required" });
     return;
   }
@@ -99,6 +99,16 @@ router.post("/verify/resend", async (req: Request, res: Response): Promise<void>
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as VerificationEmailPayload;
     const verification_token: string = randomUUID();
     const token_expiry_time = new Date((Date.now() + (1000 * 60 * 60 * 24)));  // 24 hours
+
+    const fetch_user_result = await pool.query(
+      `SELECT * FROM users
+      WHERE email = $1`,
+      [decoded.email]
+    );
+    if (fetch_user_result.rows.length === 0) {
+      res.status(404).json({ error: `No LinkVault account associated with the email ${decoded.email} has been found.` });
+    }
+
     await pool.query(
       `UPDATE users
       SET verification_token = $1, verification_token_expires = $2
@@ -120,7 +130,7 @@ router.post("/verify/resend", async (req: Request, res: Response): Promise<void>
     } else if (err instanceof JsonWebTokenError) {
       res.status(401).json({ error: "Invalid token" });
     } else {
-      res.status(500).json({ error: "Internal server error "});
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 });
@@ -128,7 +138,7 @@ router.post("/verify/resend", async (req: Request, res: Response): Promise<void>
 router.post("/login", async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (!email || email === "" || !password || password === "") {
     res.status(400).json({ error: "Email and password are required" });
     return;
   }
@@ -169,7 +179,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
         process.env.JWT_SECRET!,
         { expiresIn: "15m" },
       );
-      res.status(403).json({ verification_email_token, error: error_message });
+      res.status(403).json({ verification_email_token: verification_email_token, error: error_message });
       return;
     }
 
@@ -179,7 +189,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
       { expiresIn: "7d" },
     );
 
-    res.status(200).json({ token, user: { id: user.id, email: user.email } });
+    res.status(200).json({ token: token, user: { id: user.id, email: user.email } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
