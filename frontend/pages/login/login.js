@@ -12,11 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const error_msg_container = document.getElementById("error-msg-container");
     const error_msg_p = document.getElementById("error-msg");
     function showError(message) {
-        error_msg_p.textContent = message;
-        error_msg_container.style.display = "block";
-    }
-    function hideError() {
-        error_msg_container.style.display = "none";
+        alert(message);
     }
 
     // Email input validation
@@ -30,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        hideError();
 
         const email = document.getElementById("email").value.trim();
         if (!isValidEmail(email)) {
