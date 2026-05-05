@@ -8,7 +8,7 @@ router.post("", async (req: AuthRequest, res: Response): Promise<void> => {
   const { userId } = req.user!;
   const { url, title, tags } = req.body;
 
-  if (!url || !title) {
+  if (!url || url === "" || !title || title === "") {
     res.status(400).json({ error: "URL and title are required" });
     return;
   }
@@ -24,9 +24,12 @@ router.post("", async (req: AuthRequest, res: Response): Promise<void> => {
 
   try {
     const result = await pool.query(query, params);
+    if (result.rows.length === 0) {
+      res.status(500).json({ error: "Internal server error" });
+    }
     const bookmark = result.rows[0];
 
-    res.status(201).json({ bookmark });
+    res.status(201).json({ bookmark: bookmark });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -51,9 +54,8 @@ router.get("", async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const result = await pool.query(query, params);
     const bookmarks = result.rows;
-    console.log(bookmarks);
 
-    res.status(200).json({ bookmarks });
+    res.status(200).json({ bookmarks: bookmarks });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -62,10 +64,16 @@ router.get("", async (req: AuthRequest, res: Response): Promise<void> => {
 
 router.get("/:id", async (req: AuthRequest, res: Response): Promise<void> => {
   const { userId } = req.user!;
-  const { id } = req.params;
+  const { id } = req.params!;
+  const id_number = parseInt(id as string, 10);
+
+  if (isNaN(id_number)) {
+    res.status(400).json({ error: "Invalid bookmark id" });
+    return;
+  }
 
   const query = "SELECT * FROM bookmarks WHERE user_id = $1 AND id = $2";
-  const params = [userId, id];
+  const params = [userId, id_number];
 
   try {
     const result = await pool.query(query, params);
@@ -77,7 +85,7 @@ router.get("/:id", async (req: AuthRequest, res: Response): Promise<void> => {
 
     const bookmark = result.rows[0];
 
-    res.status(200).json({ bookmark });
+    res.status(200).json({ bookmark: bookmark });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -88,8 +96,8 @@ router.put("/folder", async (req: AuthRequest, res: Response): Promise<void> => 
   const { userId } = req.user!;
   const { old_folder, new_folder } = req.body;
 
-  if (!old_folder || !new_folder) {
-    res.status(400).json({ error: "old_folder and new_folder are required" });
+  if (!old_folder || old_folder === "" || !new_folder || new_folder === "") {
+    res.status(400).json({ error: "Current folder name and new folder name are required" });
     return;
   }
 
@@ -106,6 +114,10 @@ router.put("/folder", async (req: AuthRequest, res: Response): Promise<void> => 
       `folder:${new_folder}`,
       userId,
     ]);
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: `No \'${old_folder}\' folder found.` });
+      return;
+    }
     res.status(200).json({ updated: result.rows });
   } catch (err) {
     console.error(err);
@@ -157,16 +169,14 @@ router.put("/bookmark/:id", async (req: AuthRequest, res: Response): Promise<voi
     }
 
     const bookmark = result.rows[0];
-    res.status(200).json({ bookmark });
+    res.status(200).json({ bookmark: bookmark });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.delete(
-  "/:id",
-  async (req: AuthRequest, res: Response): Promise<void> => {
+router.delete("/:id", async (req: AuthRequest, res: Response): Promise<void> => {
     const { userId } = req.user!;
     const { id } = req.params;
 

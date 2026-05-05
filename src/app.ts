@@ -48,7 +48,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-if (process.env.NODE_ENV !== "TEST") {
+if (process.env.NODE_ENV! as string !== "test") {
   app.use(globalLimiter);
   authRouter.use(authLimiter);
 }
