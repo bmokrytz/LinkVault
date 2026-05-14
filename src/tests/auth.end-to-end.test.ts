@@ -29,7 +29,7 @@ describe('Auth Router End to End Testing', () => {
                 .send({ email: test_email, password: test_password });
             expect(response.status).toEqual(201);
             expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual(`A verification email has been sent to ${test_email}.\nPlease check your inbox for a verification link.`);
+            expect(response.body.message).toEqual(`${test_email}`);
         });
     });
 

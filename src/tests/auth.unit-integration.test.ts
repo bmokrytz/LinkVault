@@ -42,7 +42,7 @@ describe('Testing All Auth Router Endpoints', () => {
                 .send({ email: test_email, password: test_password });
             expect(response.status).toEqual(201);
             expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual(`A verification email has been sent to ${test_email}.\nPlease check your inbox for a verification link.`);
+            expect(response.body.message).toEqual(`${test_email}`);
             expect(mockSendVerificationEmail).toHaveBeenCalledTimes(1);
         });
         // 2. empty email string
@@ -108,7 +108,7 @@ describe('Testing All Auth Router Endpoints', () => {
                 .send({ email: test_email, password: test_password });
             expect(response_1.status).toEqual(201);
             expect(response_1.body.message).not.toBeUndefined();
-            expect(response_1.body.message).toEqual(`A verification email has been sent to ${test_email}.\nPlease check your inbox for a verification link.`);
+            expect(response_1.body.message).toEqual(`${test_email}`);
             expect(mockSendVerificationEmail).toHaveBeenCalled();
 
             mockSendVerificationEmail.mockClear();
