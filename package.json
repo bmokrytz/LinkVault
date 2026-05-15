@@ -28,6 +28,7 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^0.2.3",
     "@types/aws-lambda": "^8.10.161",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",

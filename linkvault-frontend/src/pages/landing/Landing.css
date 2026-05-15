@@ -1,0 +1,73 @@
+#header-bar {
+    height: 60px;
+    width: 100%;
+    /* border-bottom: 1px solid rgb(70, 84, 97); */
+}
+
+#landing-title {
+    padding: 0;
+    margin: 0;
+    color: white;
+    position: relative;
+}
+
+#landing-title h1 {
+    padding: 0;
+    margin: 0;
+    color: white;
+    position: relative;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    font-size: 70px;
+    padding-bottom: 20px;
+}
+
+#landing-text p {
+    padding: 0;
+    margin: 0;
+    color: rgb(139, 141, 143);
+    position: relative;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    font-size: 20px;
+    padding-bottom: 20px;
+}
+
+#buttons-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 30px;
+    margin-bottom: 200px;
+}
+
+#buttons-container button {
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-left: 50px;
+    margin-right: 50px;
+    transition: background-color 150ms;
+}
+
+.register-btn {
+    background-color: rgb(79, 70, 229);
+}
+
+.register-btn:hover {
+    background-color: rgb(99, 102, 241);
+}
+
+.login-btn-landing {
+    background-color: rgb(39, 112, 214);
+}
+
+.login-btn-landing:hover {
+    background-color: rgb(45, 130, 250);
+}
