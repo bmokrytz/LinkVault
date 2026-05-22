@@ -1,11 +1,11 @@
 import type { ErrorTextContextType } from "../../context";
 
 export function showError(message: string, errorTextContext: ErrorTextContextType) {
-    errorTextContext.updateErrorText(message);
-    errorTextContext.updateShowErrorText(true);
+    errorTextContext.setErrorText(message);
+    errorTextContext.setShowErrorText(true);
 }
 
 export function hideError(errorTextContext: ErrorTextContextType) {
-    errorTextContext.updateErrorText("");
-    errorTextContext.updateShowErrorText(false);
+    errorTextContext.setErrorText("");
+    errorTextContext.setShowErrorText(false);
 }

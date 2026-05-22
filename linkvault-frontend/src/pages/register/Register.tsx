@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useContext } from "react";
-import { MessageContext, ErrorTextContext } from '../../context';
+import { MessageContext, ErrorTextContext, TitleContext } from '../../context';
 import { register } from '../../lib/api/auth';
-import { BackButton } from '../../components';
+import { BackButton, AuthInput } from '../../components';
 import { showError, hideError } from "../../lib/utils/errors";
-import { validateRegistrationFields } from "../../lib/utils/validate";
+import { validateFormFields } from "../../lib/utils/validate";
 import './Register.css';
 import { useNavigate } from "react-router";
 
@@ -13,13 +13,20 @@ type RegistrationState = "register" | "email_verification_message";
 function Register() {
     const [state, setState] = useState<RegistrationState>("register");
     const [messageText, setMessageText] = useState<string>("");
+    const titleContext = useContext(TitleContext);
+    
+      useEffect(() => {
+        titleContext.setTitle("LinkVault - Register");
+      }, []);
 
     return (
         <>
-            <BackButton/>
-            <MessageContext value={{ message: messageText, update: setMessageText}}>
-                { state === "register" ? <RegistrationForm setState={setState}/> : <EmailVerificationMessage/> }
-            </MessageContext>
+            <div className="content-container">
+                <BackButton/>
+                <MessageContext value={{ message: messageText, update: setMessageText}}>
+                    { state === "register" ? <RegistrationForm setState={setState}/> : <EmailVerificationMessage/> }
+                </MessageContext>
+            </div>
         </>
     );
 }
@@ -38,7 +45,6 @@ function RegistrationForm({ setState,}: RegistrationFormProps) {
     const [errorText, setErrorText] = useState<string>("");
 
     const emailInputRef = useRef<HTMLInputElement>(null);
-    const formRef = useRef<HTMLFormElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
 
     const inputValues: RegistrationFormInputValues = {email, password, password_conf};
@@ -52,9 +58,9 @@ function RegistrationForm({ setState,}: RegistrationFormProps) {
     return (
         <div className="register-container">
             <div className="form-container">
-                <ErrorTextContext value={{errorText: errorText, updateErrorText: setErrorText, showErrorText: showErrorText, updateShowErrorText: setShowErrorText}}>
+                <ErrorTextContext value={{errorText: errorText, setErrorText: setErrorText, showErrorText: showErrorText, setShowErrorText: setShowErrorText}}>
                     <h1>Create an Account</h1>
-                    <form ref={formRef} onKeyDown={(e) => {
+                    <form onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
                             if (buttonRef.current) {
@@ -62,39 +68,15 @@ function RegistrationForm({ setState,}: RegistrationFormProps) {
                             }
                         }}}>
                         { showErrorText === true ? <h2>{errorText}</h2> : null }
-                        <AuthInput label={"Email:"} callBack={setEmail}/>
-                        <AuthInput label={"Password:"} callBack={setPassword}/>
-                        <AuthInput label={"Confirm password:"} callBack={setPasswordConf}/>
+                        <AuthInput label={"Email:"} ref={emailInputRef} callBack={setEmail} inputType="email" name="email"/>
+                        <AuthInput label={"Password:"} callBack={setPassword} inputType="password" name="password"/>
+                        <AuthInput label={"Confirm password:"} callBack={setPasswordConf} inputType="password" name="conf_password"/>
                         <SubmitButton inputValues={inputValues} buttonRef={buttonRef} setRegisterState={setState}/>
                     </form>
                 </ErrorTextContext>
             </div>
         </div>
     );
-}
-
-type AuthInputProps = {
-    label: string;
-    callBack: React.Dispatch<React.SetStateAction<string>>;
-};
-
-function AuthInput({
-    label,
-    callBack,
-}: AuthInputProps) {
-    const errorTextContext = useContext(ErrorTextContext);
-    const showErrorText = errorTextContext.showErrorText;
-
-    return (
-        <div className="auth-input" style={{ paddingBottom: "30px" }}>
-            <div className="auth-input-label-container">
-                <label htmlFor="password">{label}</label>
-                { showErrorText === true ? <label className="required-field-label">*</label> : null }
-            </div>
-            <br/>
-            <input type="password" id="password" name="user-password" placeholder="••••••••••••••••" onChange={e => callBack(e.target.value)}/>
-        </div>
-    )
 }
 
 function EmailVerificationMessage() {
@@ -139,7 +121,7 @@ function SubmitButton({
     async function clickHandler() {
         setState("disabled");
         setLabel("Creating account...");
-        const isInvalid = validateRegistrationFields(inputValues);
+        const isInvalid = validateFormFields(inputValues);
         if (isInvalid) {
             showError(isInvalid, errorTextContext);
         } else {

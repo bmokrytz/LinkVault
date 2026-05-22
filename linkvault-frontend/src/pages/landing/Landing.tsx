@@ -1,19 +1,28 @@
 import "./Landing.css";
 import { useNavigate } from "react-router";
+import { useContext, useEffect } from "react";
+import { TitleContext } from "../../context";
 
 function Landing() {
+  const titleContext = useContext(TitleContext);
+
+  useEffect(() => {
+    titleContext.setTitle("LinkVault");
+  }, []);
 
   return (
     <>
-      <div id="landing-title">
-        <h1>LinkVault</h1>
-      </div>
-      <div id="landing-text">
-        <p>Your personal bookmark manager. Save, organize, and retrieve your links — privately.</p>
-      </div>
-      <div id="buttons-container">
-          <RegisterButton />
-          <LoginButton />
+      <div className="content-container">
+        <div className="landing-title">
+          <h1>LinkVault</h1>
+        </div>
+        <div className="landing-text">
+          <p>Your personal bookmark manager. Save, organize, and retrieve your links — privately.</p>
+        </div>
+        <div className="buttons-container">
+            <RegisterButton />
+            <LoginButton />
+        </div>
       </div>
     </>
   )
@@ -48,5 +57,4 @@ function LoginButton() {
 }
 
 
-export default Landing
-
+export default Landing;
