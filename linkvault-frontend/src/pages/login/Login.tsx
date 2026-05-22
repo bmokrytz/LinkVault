@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { useState, useRef, useContext, useEffect } from 'react';
 import { ErrorTextContext, UserContext, TitleContext, VerificationContext } from '../../context';
-import { showError, hideError } from '../../lib/utils/errors';
+import { showError } from '../../lib/utils/errors';
 import { validateFormFields } from '../../lib/utils/validate';
 import { login, resendVerification } from "../../lib/api/auth";
 import { isVerificationTokenPayload } from "../../lib/utils/validate";
