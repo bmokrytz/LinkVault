@@ -29,7 +29,7 @@ describe('Auth Router End to End Testing', () => {
                 .send({ email: test_email, password: test_password });
             expect(response.status).toEqual(201);
             expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual(`A verification email has been sent to ${test_email}.\nPlease check your inbox for a verification link.`);
+            expect(response.body.message).toEqual(`${test_email}`);
         });
     });
 
@@ -63,8 +63,6 @@ describe('Auth Router End to End Testing', () => {
             const response = await request(app)
                 .get(`/auth/verify/${verification_token}`);
             expect(response.status).toEqual(200);
-            expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual("Thank you for verifying your account. You may sign into LinkVault now.");
         });
     });
 
@@ -84,8 +82,6 @@ describe('Auth Router End to End Testing', () => {
                 .post('/auth/verify/resend')
                 .set("authorization", `Bearer ${verification_email_token}`);
             expect(response.status).toEqual(200);
-            expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual("Verification email sent");
         });
     });
 

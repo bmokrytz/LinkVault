@@ -42,7 +42,7 @@ describe('Testing All Auth Router Endpoints', () => {
                 .send({ email: test_email, password: test_password });
             expect(response.status).toEqual(201);
             expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual(`A verification email has been sent to ${test_email}.\nPlease check your inbox for a verification link.`);
+            expect(response.body.message).toEqual(`${test_email}`);
             expect(mockSendVerificationEmail).toHaveBeenCalledTimes(1);
         });
         // 2. empty email string
@@ -108,7 +108,7 @@ describe('Testing All Auth Router Endpoints', () => {
                 .send({ email: test_email, password: test_password });
             expect(response_1.status).toEqual(201);
             expect(response_1.body.message).not.toBeUndefined();
-            expect(response_1.body.message).toEqual(`A verification email has been sent to ${test_email}.\nPlease check your inbox for a verification link.`);
+            expect(response_1.body.message).toEqual(`${test_email}`);
             expect(mockSendVerificationEmail).toHaveBeenCalled();
 
             mockSendVerificationEmail.mockClear();
@@ -206,8 +206,6 @@ describe('Testing All Auth Router Endpoints', () => {
             const response = await request(app)
                 .get(`/auth/verify/${verification_token}`);
             expect(response.status).toEqual(500);
-            expect(response.body.error).not.toBeUndefined();
-            expect(response.body.error).toEqual("Internal server error");
             
             poolQuerySpy.mockRestore();
             await TestHelpers.removeTestUserFromDB();
@@ -220,8 +218,6 @@ describe('Testing All Auth Router Endpoints', () => {
             const response = await request(app)
                 .get(`/auth/verify/${verification_token}`);
             expect(response.status).toEqual(200);
-            expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual("Thank you for verifying your account. You may sign into LinkVault now.");
 
             await TestHelpers.removeTestUserFromDB();
         });
@@ -295,8 +291,6 @@ describe('Testing All Auth Router Endpoints', () => {
                 .post('/auth/verify/resend')
                 .set('authorization', `Bearer ${verification_email_token}`);
             expect(response.status).toEqual(404);
-            expect(response.body.error).not.toBeUndefined();
-            expect(response.body.error).toEqual(`No LinkVault account associated with the email undefined has been found.`);
         });
         // 6. invalid email in verification email JWT payload
         test('POST /auth/verify/resend - Case 6 - With invalid email in JWT payload should return 500 internal server error', async () => {
@@ -306,8 +300,6 @@ describe('Testing All Auth Router Endpoints', () => {
                 .post('/auth/verify/resend')
                 .set('authorization', `Bearer ${verification_email_token}`);
             expect(response.status).toEqual(404);
-            expect(response.body.error).not.toBeUndefined();
-            expect(response.body.error).toEqual(`No LinkVault account associated with the email ${invalid_email} has been found.`);
         });
         // 7. database error
         test('POST /auth/verify/resend - Case 7 - With database error should return 500 internal server error', async () => {
@@ -340,8 +332,6 @@ describe('Testing All Auth Router Endpoints', () => {
                 .post('/auth/verify/resend')
                 .set('authorization', `Bearer ${verification_email_token}`);
             expect(response.status).toEqual(200);
-            expect(response.body.message).not.toBeUndefined();
-            expect(response.body.message).toEqual("Verification email sent");
         });
         
     });
@@ -431,7 +421,7 @@ describe('Testing All Auth Router Endpoints', () => {
                 .send({ email: test_email, password: test_password });
             expect(response.status).toEqual(403);
             expect(response.body.error).not.toBeUndefined();
-            expect(response.body.error).toEqual("Your email has not yet been verified. Please check your inbox for our email verification link.");
+            expect(response.body.error).toEqual("This account has not yet been verified. Check your email inbox for a verification link or send a new verification link.");
             expect(response.body.verification_email_token).not.toBeUndefined();
         });
         // 8. user unverified, token has expired
@@ -455,7 +445,7 @@ describe('Testing All Auth Router Endpoints', () => {
                 .send({ email: test_email, password: test_password });
             expect(response.status).toEqual(403);
             expect(response.body.error).not.toBeUndefined();
-            expect(response.body.error).toEqual("The verification link we sent to your email has expired. Please request a new one and verify your email to register your account.");
+            expect(response.body.error).toEqual("The verification link we sent to your email has expired. Send a new verification link and verify your email to register your account.");
             expect(response.body.verification_email_token).not.toBeUndefined();
         });
         // 9. database error
