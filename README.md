@@ -4,7 +4,7 @@ LinkVault is a full-stack web application for managing web bookmarks. Using Link
 
 ### Motivation
 
-My motivation behind creating LinkVault was to gain backend development experience and exposure to a tech stack that I was not familiar with. This is my first project with TypeScript and AWS Lambda and it provided me with valuable experience to carry forward.
+My motivation behind creating LinkVault was to gain backend development experience and exposure to a tech stack that I was not familiar with. This project gave me valuable experience with TypeScript, AWS Lambda, and building a full-stack application with a React frontend.
 
 ### Features
 
@@ -25,7 +25,7 @@ flowchart LR
     C@{ shape: cloud, label: "API Gateway"}
     L@{ shape: cloud, label: "AWS Lambda"}
 
-    Frontend_Server[Netlify] <-- Serve static frontend html/css/js files --> Client[Web Browser]
+    Frontend_Server[Netlify] <-- Serve React/TypeScript frontend application --> Client[Web Browser]
     Client[Web Browser] -- LinkVault API requests --> C
     C --> L
     L --> DB[(Supabase PostgreSQL Database)]
